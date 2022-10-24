@@ -1,3 +1,4 @@
+from random import uniform
 import pygame
 
 from Axis import Axis
@@ -22,9 +23,11 @@ class Game:
         self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png"))
 
         self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png"))
-        self.enemy = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.2, speed=Axis(8, 6), sprite=pygame.image.load("assets/enemy.png"))
 
         self.bullets = []
+        self.enemies = []
+
+        self.spawn_enemy()
 
     def start(self):
         while True:
@@ -34,10 +37,17 @@ class Game:
 
             self.screen.fill((30, 30, 30))
             self.player.render(self.screen)
-            self.enemy.render(self.screen)
             self.cursor.render(self.screen)
 
+            for enemy in self.enemies:
+                enemy.render(self.screen)
+
             for bullet in self.bullets:
+                for enemy in self.enemies:
+                    if enemy.get_rect().colliderect(bullet.get_rect()):
+                        self.bullets.remove(bullet)
+                        self.enemies.remove(enemy)
+
                 bullet.x += bullet.speed.x * self.frame_time
                 bullet.y += bullet.speed.y * self.frame_time
                 bullet.render(self.screen)
@@ -65,6 +75,17 @@ class Game:
         self.cursor.y = pos[1] - self.cursor.sprite.get_rect().centery
 
             
+    def get_bullet_speed(self):
+        x = (self.cursor.x - self.player.x)/25
+        y = (self.cursor.y - self.player.y)/25
+
+        return Axis(x, y)
+
+    def spawn_enemy(self):
+        self.enemies.append(
+            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(8, 6), sprite=pygame.image.load("assets/enemy.png"))
+        )
+
 
     def exec_events(self):
         for event in pygame.event.get():
@@ -73,6 +94,6 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.bullets.append(
-                    GameObject(x=self.player.x, y=self.player.y, speed=Axis(0, -15), sprite=pygame.image.load("assets/bullet.png"))
+                    GameObject(x=self.player.x, y=self.player.y, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png"))
                 )
     
