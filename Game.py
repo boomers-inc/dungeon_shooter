@@ -21,6 +21,7 @@ class Game:
         self.frame_time = 0
 
         self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png"))
+        self.player_direction = "left"
 
         self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png"))
 
@@ -73,6 +74,18 @@ class Game:
 
         self.cursor.x = pos[0] - self.cursor.sprite.get_rect().centerx
         self.cursor.y = pos[1] - self.cursor.sprite.get_rect().centery
+        
+        self.update_player_sprite()
+        
+        
+    def update_player_sprite(self):
+        if self.cursor.x < self.player.x and self.player_direction == "right":
+            self.player.sprite = pygame.transform.flip(self.player.sprite, True, False)
+            self.player_direction = "left"
+            
+        elif self.cursor.x > self.player.x and self.player_direction == "left":
+            self.player.sprite = pygame.transform.flip(self.player.sprite, True, False)
+            self.player_direction = "right"
 
             
     def get_bullet_speed(self):
