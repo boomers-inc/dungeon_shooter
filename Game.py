@@ -20,15 +20,18 @@ class Game:
         self.clock = pygame.time.Clock()
         self.frame_time = 0
 
-        self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png"))
+        self.bg = pygame.transform.smoothscale(pygame.image.load("assets/bg.png").convert_alpha(), (self.resolution.x, self.resolution.y))
+
+        self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png").convert_alpha())
         self.player_direction = "left"
 
-        self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png"))
+        self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png").convert_alpha())
 
         self.bullets = []
         self.enemies = []
 
         self.spawn_enemy()
+
 
     def start(self):
         while True:
@@ -36,8 +39,7 @@ class Game:
             self.exec_events()
             self.player_input()
 
-            self.screen.fill((30, 30, 30))
-            self.player.render(self.screen)
+            self.screen.blit(self.bg, (0, 0))
             self.cursor.render(self.screen)
 
             for enemy in self.enemies:
@@ -53,22 +55,29 @@ class Game:
                 bullet.y += bullet.speed.y * self.frame_time
                 bullet.render(self.screen)
 
+            self.player.render(self.screen)
+
             pygame.display.update()
+
 
     def player_input(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
-            self.player.y -= self.player.speed.y * self.frame_time
+            if self.player.y > 0:
+                self.player.y -= self.player.speed.y * self.frame_time
 
         if keys[pygame.K_s]:
-            self.player.y += self.player.speed.y * self.frame_time
+            if self.player.y < self.resolution.y * 0.95:
+                self.player.y += self.player.speed.y * self.frame_time
 
         if keys[pygame.K_a]:
-            self.player.x -= self.player.speed.x * self.frame_time
+            if self.player.x > 0:
+                self.player.x -= self.player.speed.x * self.frame_time
 
         if keys[pygame.K_d]:
-            self.player.x += self.player.speed.x * self.frame_time
+            if self.player.x < self.resolution.x * 0.95:
+                self.player.x += self.player.speed.x * self.frame_time
 
         pos = pygame.mouse.get_pos()
 
@@ -77,7 +86,7 @@ class Game:
         
         self.update_player_sprite()
         
-        
+
     def update_player_sprite(self):
         if self.cursor.x < self.player.x and self.player_direction == "right":
             self.player.sprite = pygame.transform.flip(self.player.sprite, True, False)
@@ -87,16 +96,17 @@ class Game:
             self.player.sprite = pygame.transform.flip(self.player.sprite, True, False)
             self.player_direction = "right"
 
-            
+
     def get_bullet_speed(self):
         x = (self.cursor.x - self.player.x)/25
         y = (self.cursor.y - self.player.y)/25
 
         return Axis(x, y)
 
+
     def spawn_enemy(self):
         self.enemies.append(
-            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(8, 6), sprite=pygame.image.load("assets/enemy.png"))
+            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(8, 6), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
         )
 
 
@@ -107,6 +117,5 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.bullets.append(
-                    GameObject(x=self.player.x, y=self.player.y, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png"))
+                    GameObject(x=self.player.x+self.player.get_rect()[3]/2, y=self.player.y+self.player.get_rect()[3]/2, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png").convert_alpha())
                 )
-    
