@@ -1,3 +1,4 @@
+from math import atan2, cos, sin
 from random import uniform
 import pygame
 
@@ -98,10 +99,11 @@ class Game:
 
 
     def get_bullet_speed(self):
-        x = (self.cursor.x - self.player.x)/25
-        y = (self.cursor.y - self.player.y)/25
+        my = (self.cursor.y - self.player.y)
+        mx = (self.cursor.x - self.player.x)
+        rad = atan2(my, mx)
 
-        return Axis(x, y)
+        return Axis(30 * cos(rad), 30 * sin(rad))
 
 
     def spawn_enemy(self):
