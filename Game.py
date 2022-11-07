@@ -1,5 +1,5 @@
 from math import atan2, cos, sin
-from random import uniform
+from random import randint, uniform
 import pygame
 
 from Axis import Axis
@@ -22,6 +22,7 @@ class Game:
         self.frame_time = 0
 
         self.bg = pygame.transform.smoothscale(pygame.image.load("assets/bg.png").convert_alpha(), (self.resolution.x, self.resolution.y))
+        self.door = GameObject(x=self.resolution.x/2, y=0, sprite=pygame.image.load("assets/door.png").convert_alpha(), speed=())
 
         self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png").convert_alpha())
         self.player_direction = "left"
@@ -30,20 +31,35 @@ class Game:
 
         self.bullets = []
         self.enemies = []
-
-        self.spawn_enemy()
+    
+        self.level = 1
+        self.spawn_enemies_random()
 
 
     def start(self):
         while True:
             self.frame_time = self.clock.tick() / 10
-            self.exec_events()
+            self.check_events()
             self.player_input()
 
             self.screen.blit(self.bg, (0, 0))
-            self.cursor.render(self.screen)
 
             for enemy in self.enemies:
+                if enemy.x > self.resolution.x * 0.95:
+                    enemy.speed.x = -enemy.speed.x
+
+                elif enemy.x < 0:
+                    enemy.speed.x = -enemy.speed.x
+
+                if enemy.y > self.resolution.y * 0.85:
+                    enemy.speed.y = -enemy.speed.y
+                
+                elif enemy.y < 0:
+                    enemy.speed.y = -enemy.speed.y
+
+
+                enemy.x += enemy.speed.x * self.frame_time
+                enemy.y += enemy.speed.y * self.frame_time
                 enemy.render(self.screen)
 
             for bullet in self.bullets:
@@ -57,8 +73,21 @@ class Game:
                 bullet.render(self.screen)
 
             self.player.render(self.screen)
+            self.cursor.render(self.screen)
+
+            if len(self.enemies) == 0:
+                self.door.render(self.screen)
+                if self.player.get_rect().colliderect(self.door.get_rect()):
+                    self.next_level()
 
             pygame.display.update()
+
+
+    def next_level(self):
+        self.player.x = self.resolution.x/2
+        self.player.y = self.resolution.y * 0.8
+        self.level += 1
+        self.spawn_enemies_random()
 
 
     def player_input(self):
@@ -106,13 +135,17 @@ class Game:
         return Axis(30 * cos(rad), 30 * sin(rad))
 
 
+    def spawn_enemies_random(self):
+        for i in range(self.level+2):
+            self.spawn_enemy()
+
     def spawn_enemy(self):
         self.enemies.append(
-            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(8, 6), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
+            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(uniform(2, 8), uniform(-1, 1)), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
         )
 
 
-    def exec_events(self):
+    def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
