@@ -1,5 +1,5 @@
 from math import atan2, cos, sin
-from random import randint, uniform
+from random import uniform
 import pygame
 
 from Axis import Axis
@@ -65,8 +65,11 @@ class Game:
             for bullet in self.bullets:
                 for enemy in self.enemies:
                     if enemy.get_rect().colliderect(bullet.get_rect()):
-                        self.bullets.remove(bullet)
-                        self.enemies.remove(enemy)
+                        try:
+                            self.bullets.remove(bullet)
+                            self.enemies.remove(enemy)
+                        except:
+                            print("error removing item")
 
                 bullet.x += bullet.speed.x * self.frame_time
                 bullet.y += bullet.speed.y * self.frame_time
@@ -141,7 +144,7 @@ class Game:
 
     def spawn_enemy(self):
         self.enemies.append(
-            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(uniform(2, 8), uniform(-1, 1)), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
+            GameObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(uniform(-8, 8), uniform(-1, 1)), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
         )
 
 
