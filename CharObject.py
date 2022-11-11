@@ -1,3 +1,4 @@
+from random import randint
 from pygame import draw
 
 from Axis import Axis
@@ -13,7 +14,7 @@ class CharObject(GameObject):
         super().__init__(x, y, speed, sprite)
 
         self.last_bullet = 0
-        self.bullet_delay = 2000
+        self.bullet_delay = randint(800, 2000)
         self.life = life
         self.max_life = life
         self.tag = tag

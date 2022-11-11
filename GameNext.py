@@ -19,7 +19,7 @@ class Game:
         self.resolution = Axis(
             x=int(monitor.current_w * 0.9),
             y=int(monitor.current_h * 0.9))
-        self.screen = pygame.display.set_mode(size=self.resolution.to_list())
+        self.screen = pygame.display.set_mode(size=self.resolution.to_list(), depth=64)
 
         self.clock = pygame.time.Clock()
         self.frame_time = 0
@@ -211,7 +211,7 @@ class Game:
 
     def generate_item(self, enemy):
         effect = choice([{'effect': heal, 'sprite': "assets/medkit.png"},
-                         {'effect': add_damage, 'sprite': "assets/player.png"}])
+                         {'effect': add_damage, 'sprite': "assets/damage.png"}])
 
         new_item = Item(x=enemy.x, y=enemy.y, sprite=pygame.image.load(effect['sprite']).convert_alpha(),
                         effect=effect['effect'])
