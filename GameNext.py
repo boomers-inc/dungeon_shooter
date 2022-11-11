@@ -25,8 +25,16 @@ class Game:
 
         self.bg = pygame.transform.smoothscale(pygame.image.load("assets/bg.png").convert_alpha(),
                                                (self.resolution.x, self.resolution.y))
-        self.door = GameObject(x=self.resolution.x / 2, y=0,
-                               sprite=pygame.image.load("assets/door.png").convert_alpha(), speed=())
+
+        self.door_open_sprite = pygame.transform.smoothscale(pygame.image.load("assets/door_open.png").convert_alpha(),
+                                               (self.resolution.x*0.07, self.resolution.y*0.145))
+
+        self.door_sprite =  pygame.transform.smoothscale(pygame.image.load("assets/door.png").convert_alpha(),
+                                               (self.resolution.x*0.07, self.resolution.y*0.145))
+
+        self.door_open = GameObject(x=self.resolution.x / 2, y=0, sprite=self.door_open_sprite, speed=())
+
+        self.door = GameObject(x=self.resolution.x / 2, y=0, sprite=self.door_sprite, speed=())
 
         self.player = CharObject(x=self.resolution.x / 2, y=self.resolution.y * 0.8, speed=Axis(8, 6),
                                  sprite=pygame.image.load("assets/player.png").convert_alpha(), life=80, tag=0)
@@ -52,6 +60,15 @@ class Game:
                 self.player_input()
 
             self.screen.blit(self.bg, (0, 0))
+            
+            if len(self.enemies) == 0:
+                self.door_open.render(self.screen)
+                
+                if self.player.get_rect().colliderect(self.door_open.get_rect()):
+                    self.next_level()
+
+            else:
+                self.door.render(self.screen)
 
             for enemy in self.enemies:
                 if enemy.x > self.resolution.x * 0.95:
@@ -111,12 +128,8 @@ class Game:
             if not self.game_over:
                 self.player.render(self.screen)
 
+            
             self.cursor.render(self.screen)
-
-            if len(self.enemies) == 0:
-                self.door.render(self.screen)
-                if self.player.get_rect().colliderect(self.door.get_rect()):
-                    self.next_level()
 
             self.score.render(self.screen)
 
@@ -132,7 +145,7 @@ class Game:
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
-            if self.player.y > 0:
+            if self.player.y > 50:
                 self.player.y -= self.player.speed.y * self.frame_time
 
         if keys[pygame.K_s]:
