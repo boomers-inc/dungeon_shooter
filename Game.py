@@ -130,12 +130,12 @@ class Game:
             self.player_direction = "right"
 
 
-    def get_bullet_speed(self):
-        my = (self.cursor.y - self.player.y)
-        mx = (self.cursor.x - self.player.x)
+    def get_bullet_speed(self, source_obj, target_obj, speed):
+        my = (target_obj.y - source_obj.y)
+        mx = (target_obj.x - source_obj.x)
         rad = atan2(my, mx)
 
-        return Axis(30 * cos(rad), 30 * sin(rad))
+        return Axis(speed * cos(rad), speed * sin(rad))
 
 
     def spawn_enemies_random(self):
@@ -155,5 +155,5 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.bullets.append(
-                    GameObject(x=self.player.x+self.player.get_rect()[3]/2, y=self.player.y+self.player.get_rect()[3]/2, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png").convert_alpha())
+                    GameObject(x=self.player.x+self.player.get_rect()[3]/2, y=self.player.y+self.player.get_rect()[3]/2, speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30), sprite=pygame.image.load("assets/bullet.png").convert_alpha())
                 )
