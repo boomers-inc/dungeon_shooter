@@ -5,6 +5,7 @@ from GameObject import GameObject
 
 COLOR_GREEN = (100, 255, 100)
 COLOR_RED = (255, 50, 50)
+COLOR_YELLOW = (250, 255, 97)
 
 
 class CharObject(GameObject):
@@ -18,6 +19,10 @@ class CharObject(GameObject):
         self.tag = tag
 
     def render_life_bar(self, screen, align="bottom", color=COLOR_GREEN):
+
+        if self.tag != 0:
+            color = COLOR_YELLOW
+
         size = self.get_sprite_size()
         life_bar_size = Axis(size.x, size.y / 10)
 
