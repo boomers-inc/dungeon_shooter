@@ -1,9 +1,10 @@
 from math import atan2, cos, sin
-from random import uniform
+from random import uniform, randint
 import pygame
 
 from Axis import Axis
 from Bullet import Bullet
+from Score import Score
 from CharObject import CharObject
 from GameObject import GameObject
 
@@ -38,6 +39,8 @@ class Game:
         self.player = CharObject(x=self.resolution.x / 2, y=self.resolution.y * 0.8, speed=Axis(8, 6),
                                  sprite=pygame.image.load("assets/player.png").convert_alpha(), life=80, tag=0)
         self.player_direction = "left"
+
+        self.score = Score(x=0, y=10)
 
         self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png").convert_alpha())
 
@@ -88,8 +91,7 @@ class Game:
                     self.bullets.append(
                         Bullet(x=enemy.x + enemy.get_rect()[3] / 2, y=enemy.y + enemy.get_rect()[3] / 2,
                                speed=self.get_bullet_speed(source_obj=enemy, target_obj=self.player, speed=3),
-                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=enemy.tag)
-                    )
+                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=enemy.tag))
 
                 enemy.render(self.screen)
 
@@ -101,6 +103,7 @@ class Game:
                                 if enemy.life - bullet.damage > 0:
                                     enemy.life -= bullet.damage
                                 else:
+                                    self.score.value += randint(100, 150)
                                     self.enemies.remove(enemy)
                                 self.bullets.remove(bullet)
                             except:
@@ -127,6 +130,8 @@ class Game:
 
             
             self.cursor.render(self.screen)
+
+            self.score.render(self.screen)
 
             pygame.display.update()
 
