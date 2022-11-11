@@ -7,7 +7,7 @@ class GameObject:
         self.x = x
         self.y = y
         self.speed = speed
-        if sprite is not ...:
+        if sprite is not None:
             self.sprite = sprite.convert_alpha()
 
     def get_rect(self):

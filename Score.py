@@ -5,7 +5,7 @@ FONT_RETRO_GAMING = 'assets/Retro-Gaming.ttf'
 
 
 class Score(GameObject):
-    def __init__(self, x=0, y=0, speed=..., sprite=..., font_size=20, color=None, value=0):
+    def __init__(self, x=0, y=0, speed=None, sprite=None, font_size=20, color=None, value=0):
         super().__init__(x, y, speed, sprite)
 
         if color is None:
