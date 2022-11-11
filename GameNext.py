@@ -27,10 +27,10 @@ class Game:
                                                (self.resolution.x, self.resolution.y))
 
         self.door_open_sprite = pygame.transform.smoothscale(pygame.image.load("assets/door_open.png").convert_alpha(),
-                                               (self.resolution.x*0.07, self.resolution.y*0.145))
+                                                             (self.resolution.x * 0.07, self.resolution.y * 0.145))
 
-        self.door_sprite =  pygame.transform.smoothscale(pygame.image.load("assets/door.png").convert_alpha(),
-                                               (self.resolution.x*0.07, self.resolution.y*0.145))
+        self.door_sprite = pygame.transform.smoothscale(pygame.image.load("assets/door.png").convert_alpha(),
+                                                        (self.resolution.x * 0.07, self.resolution.y * 0.145))
 
         self.door_open = GameObject(x=self.resolution.x / 2, y=0, sprite=self.door_open_sprite, speed=())
 
@@ -60,10 +60,10 @@ class Game:
                 self.player_input()
 
             self.screen.blit(self.bg, (0, 0))
-            
+
             if len(self.enemies) == 0:
                 self.door_open.render(self.screen)
-                
+
                 if self.player.get_rect().colliderect(self.door_open.get_rect()):
                     self.next_level()
 
@@ -128,7 +128,6 @@ class Game:
             if not self.game_over:
                 self.player.render(self.screen)
 
-            
             self.cursor.render(self.screen)
 
             self.score.render(self.screen)
@@ -189,8 +188,8 @@ class Game:
 
     def spawn_enemy(self):
         new_enemy = CharObject(x=self.resolution.x * uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3),
-                       speed=Axis(uniform(-8, 8), uniform(-1, 1)),
-                       sprite=pygame.image.load("assets/enemy.png").convert_alpha(), tag=1)
+                               speed=Axis(uniform(-8, 8), uniform(-1, 1)),
+                               sprite=pygame.image.load("assets/enemy.png").convert_alpha(), tag=1)
 
         new_enemy.last_bullet = pygame.time.get_ticks()
         self.enemies.append(new_enemy)
@@ -204,16 +203,16 @@ class Game:
                 if not self.game_over:
                     self.bullets.append(
                         Bullet(x=self.player.x + self.player.get_rect()[3] / 2,
-                            y=self.player.y + self.player.get_rect()[3] / 2,
-                            speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30),
-                            sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
+                               y=self.player.y + self.player.get_rect()[3] / 2,
+                               speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30),
+                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
                     )
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     if self.game_over:
                         self.player.life = 80
-                        self.player.x=self.resolution.x / 2
-                        self.player.y=self.resolution.y * 0.8
+                        self.player.x = self.resolution.x / 2
+                        self.player.y = self.resolution.y * 0.8
                         self.enemies = []
                         self.bullets = []
                         self.level = 1
