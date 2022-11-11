@@ -9,7 +9,7 @@ COLOR_YELLOW = (250, 255, 97)
 
 
 class CharObject(GameObject):
-    def __init__(self, x, y, speed, sprite, tag, life=100):
+    def __init__(self, x, y, speed, sprite, tag, life=100, gun_damage=20):
         super().__init__(x, y, speed, sprite)
 
         self.last_bullet = 0
@@ -17,6 +17,7 @@ class CharObject(GameObject):
         self.life = life
         self.max_life = life
         self.tag = tag
+        self.gun_damage = gun_damage
 
     def render_life_bar(self, screen, align="bottom", color=COLOR_GREEN):
 

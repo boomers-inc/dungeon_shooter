@@ -1,9 +1,10 @@
 from math import atan2, cos, sin
-from random import uniform, randint
+from random import uniform, randint, choice
 import pygame
 
 from Axis import Axis
 from Bullet import Bullet
+from Item import Item, heal, add_damage
 from Score import Score
 from CharObject import CharObject
 from GameObject import GameObject
@@ -46,6 +47,7 @@ class Game:
 
         self.bullets = []
         self.enemies = []
+        self.items = []
         self.game_over = False
 
         self.level = 1
@@ -104,8 +106,10 @@ class Game:
                                     enemy.life -= bullet.damage
                                 else:
                                     self.score.value += randint(100, 150)
+                                    self.generate_item(enemy)
                                     self.enemies.remove(enemy)
                                 self.bullets.remove(bullet)
+
                             except:
                                 print("error removing item")
 
@@ -120,6 +124,17 @@ class Game:
                             self.bullets.remove(bullet)
                         except:
                             print("error removing item")
+
+                for item in self.items:
+                    if item.get_rect().colliderect(self.player.get_rect()):
+                        try:
+                            item.effect(player=self.player)
+                            self.items.remove(item)
+
+                        except:
+                            print("error using item")
+
+                    item.render(self.screen)
 
                 bullet.x += bullet.speed.x * self.frame_time
                 bullet.y += bullet.speed.y * self.frame_time
@@ -194,6 +209,15 @@ class Game:
         new_enemy.last_bullet = pygame.time.get_ticks()
         self.enemies.append(new_enemy)
 
+    def generate_item(self, enemy):
+        effect = choice([{'effect': heal, 'sprite': "assets/medkit.png"},
+                         {'effect': add_damage, 'sprite': "assets/player.png"}])
+
+        new_item = Item(x=enemy.x, y=enemy.y, sprite=pygame.image.load(effect['sprite']).convert_alpha(),
+                        effect=effect['effect'])
+
+        self.items.append(new_item)
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -205,8 +229,8 @@ class Game:
                         Bullet(x=self.player.x + self.player.get_rect()[3] / 2,
                                y=self.player.y + self.player.get_rect()[3] / 2,
                                speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30),
-                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
-                    )
+                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag,
+                               damage=self.player.gun_damage))
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     if self.game_over:
