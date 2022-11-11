@@ -93,8 +93,8 @@ class Game:
                     self.bullets.append(
                         Bullet(x=enemy.x + enemy.get_rect()[3] / 2, y=enemy.y + enemy.get_rect()[3] / 2,
                                speed=self.get_bullet_speed(source_obj=enemy, target_obj=self.player, speed=3),
-                               sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=enemy.tag))
-
+                               sprite=pygame.image.load("assets/bullet_enemy.png").convert_alpha(), tag=enemy.tag))
+    
                 enemy.render(self.screen)
 
             for bullet in self.bullets:
