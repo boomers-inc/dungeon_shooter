@@ -1,4 +1,6 @@
 from pygame import Rect
+from Axis import Axis
+
 
 class GameObject:
     def __init__(self, x, y, speed, sprite):
@@ -13,3 +15,7 @@ class GameObject:
 
     def render(self, screen):
         screen.blit(self.sprite, [self.x, self.y])
+
+    def get_sprite_size(self):
+        size = self.sprite.get_size()
+        return Axis(size[0], size[1])
