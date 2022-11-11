@@ -3,6 +3,7 @@ from random import uniform
 import pygame
 
 from Axis import Axis
+from Bullet import Bullet
 from CharObject import CharObject
 from GameObject import GameObject
 
@@ -25,7 +26,7 @@ class Game:
         self.bg = pygame.transform.smoothscale(pygame.image.load("assets/bg.png").convert_alpha(), (self.resolution.x, self.resolution.y))
         self.door = GameObject(x=self.resolution.x/2, y=0, sprite=pygame.image.load("assets/door.png").convert_alpha(), speed=())
 
-        self.player = GameObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png").convert_alpha())
+        self.player = CharObject(x=self.resolution.x/2, y=self.resolution.y * 0.8, speed=Axis(8, 6), sprite=pygame.image.load("assets/player.png").convert_alpha(), tag=0)
         self.player_direction = "left"
 
         self.cursor = GameObject(x=0, y=0, speed=None, sprite=pygame.image.load("assets/cursor.png").convert_alpha())
@@ -65,7 +66,7 @@ class Game:
                 if pygame.time.get_ticks() - enemy.last_bullet > enemy.bullet_delay:
                     enemy.last_bullet = pygame.time.get_ticks()
                     self.bullets.append(
-                        GameObject(x=enemy.x+enemy.get_rect()[3]/2, y=enemy.y+enemy.get_rect()[3]/2, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png").convert_alpha())
+                        Bullet(x=enemy.x+enemy.get_rect()[3]/2, y=enemy.y+enemy.get_rect()[3]/2, speed=self.get_bullet_speed(source_obj=enemy, target_obj=self.player, speed=3), sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=enemy.tag)
                     )
 
                 enemy.render(self.screen)
@@ -73,9 +74,18 @@ class Game:
             for bullet in self.bullets:
                 for enemy in self.enemies:
                     if enemy.get_rect().colliderect(bullet.get_rect()):
+                        if enemy.tag != bullet.tag:
+                            try:
+                                self.bullets.remove(bullet)
+                                self.enemies.remove(enemy)
+                            except:
+                                print("error removing item")
+
+
+                if self.player.get_rect().colliderect(bullet.get_rect()):
+                    if self.player.tag != bullet.tag:
                         try:
                             self.bullets.remove(bullet)
-                            self.enemies.remove(enemy)
                         except:
                             print("error removing item")
 
@@ -138,12 +148,12 @@ class Game:
             self.player_direction = "right"
 
 
-    def get_bullet_speed(self):
-        my = (self.cursor.y - self.player.y)
-        mx = (self.cursor.x - self.player.x)
+    def get_bullet_speed(self, source_obj, target_obj, speed):
+        my = (target_obj.y - source_obj.y)
+        mx = (target_obj.x - source_obj.x)
         rad = atan2(my, mx)
 
-        return Axis(30 * cos(rad), 30 * sin(rad))
+        return Axis(speed * cos(rad), speed * sin(rad))
 
 
     def spawn_enemies_random(self):
@@ -152,7 +162,7 @@ class Game:
 
     def spawn_enemy(self):
         self.enemies.append(
-            CharObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(uniform(-8, 8), uniform(-1, 1)), sprite=pygame.image.load("assets/enemy.png").convert_alpha())
+            CharObject(x=self.resolution.x*uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3), speed=Axis(uniform(-8, 8), uniform(-1, 1)), sprite=pygame.image.load("assets/enemy.png").convert_alpha(), tag=1)
         )
 
 
@@ -163,5 +173,5 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.bullets.append(
-                    GameObject(x=self.player.x+self.player.get_rect()[3]/2, y=self.player.y+self.player.get_rect()[3]/2, speed=self.get_bullet_speed(), sprite=pygame.image.load("assets/bullet.png").convert_alpha())
+                    Bullet(x=self.player.x+self.player.get_rect()[3]/2, y=self.player.y+self.player.get_rect()[3]/2, speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30), sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
                 )
