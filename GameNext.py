@@ -29,7 +29,7 @@ class Game:
                                sprite=pygame.image.load("assets/door.png").convert_alpha(), speed=())
 
         self.player = CharObject(x=self.resolution.x / 2, y=self.resolution.y * 0.8, speed=Axis(8, 6),
-                                 sprite=pygame.image.load("assets/player.png").convert_alpha(), life=500, tag=0)
+                                 sprite=pygame.image.load("assets/player.png").convert_alpha(), life=80, tag=0)
         self.player_direction = "left"
 
         self.score = Score(x=0, y=10)
@@ -38,6 +38,7 @@ class Game:
 
         self.bullets = []
         self.enemies = []
+        self.game_over = False
 
         self.level = 1
         self.spawn_enemies_random()
@@ -46,7 +47,9 @@ class Game:
         while True:
             self.frame_time = self.clock.tick() / 10
             self.check_events()
-            self.player_input()
+
+            if not self.game_over:
+                self.player_input()
 
             self.screen.blit(self.bg, (0, 0))
 
@@ -94,8 +97,9 @@ class Game:
                         try:
                             if self.player.life - bullet.damage > 0:
                                 self.player.life -= bullet.damage
-                            # else:
-                            #     self.enemies.remove(enemy)
+                            else:
+                                self.game_over = True
+
                             self.bullets.remove(bullet)
                         except:
                             print("error removing item")
@@ -104,7 +108,9 @@ class Game:
                 bullet.y += bullet.speed.y * self.frame_time
                 bullet.render(self.screen)
 
-            self.player.render(self.screen)
+            if not self.game_over:
+                self.player.render(self.screen)
+
             self.cursor.render(self.screen)
 
             if len(self.enemies) == 0:
@@ -169,11 +175,12 @@ class Game:
             self.spawn_enemy()
 
     def spawn_enemy(self):
-        self.enemies.append(
-            CharObject(x=self.resolution.x * uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3),
+        new_enemy = CharObject(x=self.resolution.x * uniform(0.1, 0.9), y=self.resolution.y * uniform(0, 0.3),
                        speed=Axis(uniform(-8, 8), uniform(-1, 1)),
                        sprite=pygame.image.load("assets/enemy.png").convert_alpha(), tag=1)
-        )
+
+        new_enemy.last_bullet = pygame.time.get_ticks()
+        self.enemies.append(new_enemy)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -181,9 +188,21 @@ class Game:
                 pygame.quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.bullets.append(
-                    Bullet(x=self.player.x + self.player.get_rect()[3] / 2,
-                           y=self.player.y + self.player.get_rect()[3] / 2,
-                           speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30),
-                           sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
-                )
+                if not self.game_over:
+                    self.bullets.append(
+                        Bullet(x=self.player.x + self.player.get_rect()[3] / 2,
+                            y=self.player.y + self.player.get_rect()[3] / 2,
+                            speed=self.get_bullet_speed(source_obj=self.player, target_obj=self.cursor, speed=30),
+                            sprite=pygame.image.load("assets/bullet.png").convert_alpha(), tag=self.player.tag)
+                    )
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    if self.game_over:
+                        self.player.life = 80
+                        self.player.x=self.resolution.x / 2
+                        self.player.y=self.resolution.y * 0.8
+                        self.enemies = []
+                        self.bullets = []
+                        self.level = 1
+                        self.spawn_enemies_random()
+                        self.game_over = False
